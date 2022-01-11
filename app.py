@@ -123,7 +123,7 @@ def add_inventory():
         data = csv.reader(csvfile)
         header = next(data)
 
-        if header != None:   #taken from pretagteam.com/quesion/iterate-from-a-certain-row-of-a-csv-file-in-python
+        if header != None:   
             for row in data:
                 product_name = row[0]
                 quantity = clean_quant(row[2])
@@ -145,18 +145,34 @@ def app():
     while app_running: 
         choice = menu()
         if choice == 'V':
-            id_choice = int(input(f'Please enter a product ID number (between 1 and {num_products}): '))
-            if id_choice in range(1,int(num_products + 1)):
-                prod_choice = session.query(Product).filter(Product.product_id==id_choice).first()
-                print(f'''
-                \n***{prod_choice.product_name}***
-                \rPrice: ${prod_choice.product_price / 100}
-                \rBrand: {prod_choice.brand.brand_name}
-                \rQuantity: {prod_choice.product_quantity}
-                \rDate Updated: {prod_choice.date_updated}
-                ''')
-                time.sleep(1.5)
-                input('\nPress ENTER to continue...')
+            while True:
+                try:
+                    id_choice = int(input(f'Please enter a product ID number (between 1 and {num_products}): '))
+                except ValueError:
+                    input(f"""
+                        ***ERROR***
+                        \rPlease enter a valid number between 1 and {num_products}
+                        \rPress ENTER to try again...""")
+                else:
+                    if id_choice in range(1,int(num_products + 1)):
+                        prod_choice = session.query(Product).filter(Product.product_id==id_choice).first()
+                        print(f'''
+                        \n***{prod_choice.product_name}***
+                        \rPrice: ${prod_choice.product_price / 100}
+                        \rBrand: {prod_choice.brand.brand_name}
+                        \rQuantity: {prod_choice.product_quantity}
+                        \rDate Updated: {prod_choice.date_updated}
+                        ''')
+                        time.sleep(1.5)
+                        input('\nPress ENTER to continue...')
+                        break
+                    else:
+                        input(f"""
+                        ***ERROR***
+                        \rThat number is not in the system
+                        \rPlease enter a valid number between 1 and {num_products}
+                        \rPress ENTER to try again...""")
+                        
 
         elif choice == 'N':
             prod_name = input('What is the name of the product? ')
